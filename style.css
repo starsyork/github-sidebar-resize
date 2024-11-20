@@ -1,0 +1,7 @@
+.file-navigation {
+    max-width: none;
+    width: 300px; 
+    resize: horizontal; 
+    overflow: auto;
+    cursor: ew-resize;
+  }
