@@ -12,6 +12,10 @@
       "activeTab",
       "storage"
     ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Resize Sidebar"
+    },
     "content_scripts": [
       {
         "matches": ["https://github.paypal.com/*"],
@@ -19,4 +23,3 @@
       }
     ]
   }
-  
