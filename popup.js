@@ -1,24 +1,29 @@
-// popup.js
-
-// Grab references to the UI components
 const widthSlider = document.getElementById('sidebar-width');
 const widthDisplay = document.getElementById('current-width');
 const saveButton = document.getElementById('save-button');
 
-// Update the visible width value when the slider changes
+// Update the visible width when the slider changes
 widthSlider.addEventListener('input', (e) => {
-  widthDisplay.textContent = `${e.target.value}px`;
+  widthDisplay.textContent = `${e.target.value}px`; // Update the live width value
 });
 
-// Save the selected width and send it to the content script
+// Send message to content script when "Save" is clicked
 saveButton.addEventListener('click', () => {
   const selectedWidth = parseInt(widthSlider.value, 10);
 
-  // Send a message to the content script with the new width
+  // Use chrome.tabs.query to get the active tab and send a message
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { action: 'RESIZE_SIDEBAR', width: selectedWidth });
+    if (tabs[0]) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'RESIZE_SIDEBAR', width: selectedWidth }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error("Error sending message to content script:", chrome.runtime.lastError);
+        } else {
+          console.log("Response from content script:", response);
+        }
+      });
+    }
   });
 
-  // Optionally, close the popup after saving
+  // Optionally close the popup
   window.close();
 });
