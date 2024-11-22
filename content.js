@@ -1,33 +1,37 @@
-(function() {
-    const sidebarSelector = '.file-navigation';  
-    function applySidebarWidth(width) {
+(function () {
+    const sidebarSelector = '.file-navigation'; // Sidebar selector
+  
+    // Apply a new width to the sidebar
+    function applyNewWidth(width) {
       const sidebar = document.querySelector(sidebarSelector);
       if (sidebar) {
-        sidebar.style.maxWidth = 'none';
         sidebar.style.width = `${width}px`;
+        sidebar.style.maxWidth = 'none';
       }
     }
   
-    chrome.storage.sync.get(['sidebarWidth'], (result) => {
-      if (result.sidebarWidth) {
-        applySidebarWidth(result.sidebarWidth);
-      }
-    });
+    // Listen for messages from the popup
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.action === 'RESIZE_SIDEBAR') {
+        const newWidth = message.width;
   
-    const observer = new MutationObserver(() => {
-      const sidebar = document.querySelector(sidebarSelector);
-      if (sidebar) {
-        sidebar.addEventListener('mouseup', () => {
-          const newWidth = sidebar.offsetWidth;
-          chrome.storage.sync.set({ sidebarWidth: newWidth }, () => {
-            console.log('Save width:', newWidth);
-          });
+        // Apply the new width
+        applyNewWidth(newWidth);
+  
+        // Save the new width to storage (optional for persistence)
+        chrome.storage.sync.set({ sidebarWidth: newWidth }, () => {
+          console.log('Sidebar width saved:', newWidth);
         });
       }
     });
   
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
+    // Load saved width on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      chrome.storage.sync.get(['sidebarWidth'], (result) => {
+        if (result.sidebarWidth) {
+          applyNewWidth(result.sidebarWidth);
+        }
+      });
     });
   })();
+  
